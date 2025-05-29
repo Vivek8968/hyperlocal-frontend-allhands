@@ -1,0 +1,15 @@
+# Python requirements for deployment tools (optional)
+# These are not required for the Next.js frontend itself
+# but may be useful for deployment scripts or CI/CD
+
+# For deployment automation
+requests==2.31.0
+python-dotenv==1.0.0
+
+# For development tools
+black==23.12.1
+flake8==7.0.0
+
+# For testing (if needed)
+pytest==7.4.4
+pytest-cov==4.1.0

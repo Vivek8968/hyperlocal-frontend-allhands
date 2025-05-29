@@ -6,7 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "audit": "npm audit",
+    "audit-fix": "npm audit fix",
+    "outdated": "npm outdated",
+    "clean": "rm -rf .next node_modules package-lock.json",
+    "reinstall": "npm run clean && npm install",
+    "docker:build": "docker build -t hyperlocal-frontend .",
+    "docker:run": "docker run -p 3000:3000 hyperlocal-frontend",
+    "docker:compose": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "check-deps": "node scripts/check-dependencies.js",
+    "setup": "npm install && cp .env.example .env.local && npm run check-deps"
   },
   "dependencies": {
     "axios": "^1.9.0",
