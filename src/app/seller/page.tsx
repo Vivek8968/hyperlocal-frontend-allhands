@@ -43,7 +43,7 @@ const SellerDashboard = () => {
           setProducts(productsResponse.data);
           
           // Calculate stats
-          const activeProducts = productsResponse.data.filter(p => p.inStock).length;
+          const activeProducts = productsResponse.data.filter((p: any) => p.inStock).length;
           setStats({
             totalProducts: productsResponse.data.length,
             activeProducts,

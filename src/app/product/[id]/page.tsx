@@ -45,7 +45,7 @@ const ProductPage = () => {
         const relatedResponse = await productAPI.getProductsByCategory(productData.category);
         if (relatedResponse.status) {
           const filtered = relatedResponse.data
-            .filter(p => p.id !== productData.id)
+            .filter((p: any) => p.id !== productData.id)
             .slice(0, 4);
           setRelatedProducts(filtered);
         }

@@ -96,6 +96,7 @@ export interface Product {
   inStock: boolean;
   quantity: number;
   unit: string;
+  createdAt?: string;
 }
 
 export interface CatalogItem {
