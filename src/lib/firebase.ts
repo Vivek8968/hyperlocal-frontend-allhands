@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithPhoneNumber, RecaptchaVerifier } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, RecaptchaVerifier, signInWithPhoneNumber, signInWithPopup, User } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -10,67 +10,54 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 
-// Mock Firebase functions for development
-export const mockSignInWithGoogle = async () => {
-  return {
-    user: {
-      uid: 'mock_uid_' + Date.now(),
-      email: 'user@example.com',
-      displayName: 'Mock User',
-      phoneNumber: '+1234567890',
+// Phone authentication
+export const setupRecaptcha = (containerId: string) => {
+  return new RecaptchaVerifier(auth, containerId, {
+    size: 'invisible',
+    callback: () => {
+      console.log('reCAPTCHA solved');
     },
-    credential: null,
-  };
+    'expired-callback': () => {
+      console.log('reCAPTCHA expired');
+    }
+  });
 };
 
-export const mockSignInWithPhone = async (phoneNumber: string) => {
-  return {
-    user: {
-      uid: 'mock_uid_' + Date.now(),
-      phoneNumber: phoneNumber,
-      email: null,
-      displayName: 'Phone User',
-    },
-    credential: null,
-  };
+export const sendOTP = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
+  try {
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+    return confirmationResult;
+  } catch (error) {
+    console.error('Error sending OTP:', error);
+    throw error;
+  }
 };
 
-export const mockGetIdToken = async () => {
-  return 'mock_firebase_token_' + Date.now();
-};
-
-// For production, use real Firebase functions
+// Google authentication
 export const signInWithGoogle = async () => {
-  if (process.env.NODE_ENV === 'development') {
-    return mockSignInWithGoogle();
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result;
+  } catch (error) {
+    console.error('Error signing in with Google:', error);
+    throw error;
   }
-  return signInWithPopup(auth, googleProvider);
 };
 
-export const signInWithPhone = async (phoneNumber: string, recaptchaVerifier: RecaptchaVerifier) => {
-  if (process.env.NODE_ENV === 'development') {
-    return mockSignInWithPhone(phoneNumber);
+// Get Firebase ID token
+export const getFirebaseIdToken = async (user: User) => {
+  try {
+    const idToken = await user.getIdToken();
+    return idToken;
+  } catch (error) {
+    console.error('Error getting Firebase ID token:', error);
+    throw error;
   }
-  return signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
 };
 
-export const getCurrentUserToken = async () => {
-  if (process.env.NODE_ENV === 'development') {
-    return mockGetIdToken();
-  }
-  
-  // Check if we're in browser environment
-  if (typeof window === 'undefined') {
-    return null;
-  }
-  
-  const user = auth.currentUser;
-  if (user) {
-    return user.getIdToken();
-  }
-  return null;
-};
+export default app;
